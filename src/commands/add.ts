@@ -58,6 +58,10 @@ export async function add(components: string[]) {
       // Fetch component from registry
       const registryData = await fetchComponent(componentName);
 
+      if (!registryData) {
+        throw new Error("Error fetching component.")
+      }
+
       // Install dependencies
       if (registryData.dependencies && registryData.dependencies.length > 0) {
         spinner.text = `Installing dependencies for ${componentName}...`;
@@ -103,34 +107,26 @@ export async function add(components: string[]) {
   console.log(chalk.green('\n✓ All components installed successfully!\n'));
 }
 
-async function fetchComponent(name: string): Promise<RegistryComponent> {
-  // Mock data for testing - replace with actual fetch later
-  return {
-    name,
-    type: 'components:ui',
-    files: [
-      {
-        name: `ui/${name}.tsx`,
-        content: `import * as React from "react"\n\nexport function ${capitalize(name)}() {\n  return <div className="p-4">${capitalize(name)} Component</div>\n}\n`,
-      },
-    ],
-    dependencies: [],
-    registryDependencies: [],
-  };
+async function fetchComponent(name: string): Promise<RegistryComponent | null> {
+  const REGISTRY_URL = 'https://raw.githubusercontent.com/nerdboi008/nerdbioi-ui/main/public/r';
   
-  // For production, use this instead:
-  /*
-  const response = await fetch(
-    `https://raw.githubusercontent.com/your-username/nerdbioi-ui/main/public/r/${name}.json`
-  );
-  
-  if (!response.ok) {
-    throw new Error(`Component "${name}" not found in registry`);
+  try {
+    const response = await fetch(`${REGISTRY_URL}/${name}.json`);
+    
+    if (!response.ok) {
+      throw new Error(`Component "${name}" not found in registry`);
+    }
+    
+    return await response.json() as RegistryComponent;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to fetch component "${name}": ${error.message}`);
+    }
+    console.error(error);
+    return null;
   }
-  
-  return await response.json();
-  */
 }
+
 
 async function installDependencies(deps: string[]): Promise<void> {
   const packageManager = detectPackageManager();
