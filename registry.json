@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "nerdbioi-ui",
+  "items": [
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "description": "A customizable button component with multiple variants",
+      "files": [
+        {
+          "path": "registry/default/ui/button.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": [
+        "@radix-ui/react-slot",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": []
+    }
+  ]
+}
